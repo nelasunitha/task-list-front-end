@@ -1,38 +1,50 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import './App.css';
-import TaskList from './components/TaskList.jsx';
-
-const TASKS = [
-  {
-    id: 1,
-    title: 'Mow the lawn',
-    isComplete: false,
-  },
-  {
-    id: 2,
-    title: 'Cook Pasta',
-    isComplete: true,
-  },
-];
+import TaskList from './components/TaskList';
 
 const App = () => {
-  // lift state up to App component
-  const [taskData, setTaskData] = useState(TASKS);
+  const [taskData, setTaskData] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/tasks')
+      .then((response) => {
+        setTaskData(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching tasks:', error);
+      });
+  }, []);
 
   const handleCompleteTask = (id) => {
-    setTaskData(
-      taskData.map((task) => {
-        if (task.id === id) {
-          return { ...task, isComplete: !task.isComplete };
-        } else {
-          return task;
-        }
-      })
-    );
+    const task = taskData.find((task) => task.id === id);
+    if (task) {
+      axios.patch(`http://localhost:5000/tasks/${id}`, { isComplete: !task.isComplete })
+        .then((response) => {
+          setTaskData((prevTaskData) =>
+            prevTaskData.map((task) => {
+              if (task.id === id) {
+                return { ...task, isComplete: !task.isComplete };
+              } else {
+                return task;
+              }
+            })
+          );
+        })
+        .catch((error) => {
+          console.error('Error updating task:', error);
+        });
+    }
   };
 
   const handleDeleteTask = (id) => {
-    setTaskData(taskData.filter((task) => task.id !== id));
+    axios.delete(`http://localhost:5000/tasks/${id}`)
+      .then(() => {
+        setTaskData(taskData.filter((task) => task.id !== id));
+      })
+      .catch((error) => {
+        console.error('Error deleting task:', error);
+      });
   };
 
   return (
@@ -42,13 +54,11 @@ const App = () => {
       </header>
       <main>
         <div>
-          {
-            <TaskList
-              tasks={taskData} // Updated prop name
-              onTaskClickCallback={handleCompleteTask} // Updated prop name
-              onTaskDeleteCallback={handleDeleteTask} // Updated prop name
-            />
-          }
+          <TaskList
+            tasks={taskData}
+            onTaskClickCallback={handleCompleteTask}
+            onTaskDeleteCallback={handleDeleteTask}
+          />
         </div>
       </main>
     </div>
