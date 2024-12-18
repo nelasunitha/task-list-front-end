@@ -20,32 +20,36 @@ const App = () => {
   const [taskData, setTaskData] = useState(TASKS);
 
   const handleCompleteTask = (id) => {
-    setTaskData(taskData => taskData.map(task => {
-      if (task.id === id) {
-        return { ...task, isComplete: !task.isComplete };
-      } else {
-        return task;
-      }
-    }));
+    setTaskData(
+      taskData.map((task) => {
+        if (task.id === id) {
+          return { ...task, isComplete: !task.isComplete };
+        } else {
+          return task;
+        }
+      })
+    );
   };
 
   const handleDeleteTask = (id) => {
-    setTaskData(taskData => taskData.filter(task => {
-      return task.id !== id;
-    }));
+    setTaskData(taskData.filter((task) => task.id !== id));
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className='App'>
+      <header className='App-header'>
         <h1>Ada&apos;s Task List</h1>
       </header>
       <main>
-        <div>{<TaskList
-          taskData={taskData}
-          onCompleteTask={handleCompleteTask}
-          onDeleteTask={handleDeleteTask}
-        />}</div>
+        <div>
+          {
+            <TaskList
+              tasks={taskData} // Updated prop name
+              onTaskClickCallback={handleCompleteTask} // Updated prop name
+              onTaskDeleteCallback={handleDeleteTask} // Updated prop name
+            />
+          }
+        </div>
       </main>
     </div>
   );

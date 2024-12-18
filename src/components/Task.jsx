@@ -31,8 +31,8 @@ Task.propTypes = {
   id: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
   isComplete: PropTypes.bool.isRequired,
-  onCompleteTask: PropTypes.func.isRequired,
-  onDeleteTask: PropTypes.func.isRequired,
+  onClickCallback: PropTypes.func.isRequired,
+  onDeleteCallback: PropTypes.func.isRequired,
 };
 
 export default Task;
