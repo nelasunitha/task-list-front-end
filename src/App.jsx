@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import TaskList from './components/TaskList';
+import NewTaskForm from './components/NewTask';
 // const TASKS = [
 //   {
 //     id: 1,
@@ -40,15 +41,16 @@ const getAllTasksApi = () => {
       console.log(error);
     });
 };
-const updateTaskApi = (id,isComplete) => {
+const updateTaskApi = (id, isComplete) => {
   const endpoint = isComplete ? 'mark_complete' : 'mark_incomplete';
-  return axios.patch(`${kbaseURL}/tasks/${id}/${endpoint}`)
-    .then( response => {
-      console.log('r',response);
-      const newTask = convertFromApi(response.data);
+  return axios
+    .patch(`${kbaseURL}/tasks/${id}/${endpoint}`)
+    .then((response) => {
+      console.log('r', response);
+      const newTask = convertFromApi(response.data.task);
       return newTask;
     })
-    .catch( error => {
+    .catch((error) => {
       console.log(error);
     });
 };
@@ -83,6 +85,14 @@ const App = () => {
   const handleDeleteTask = (id) => {
     setTaskData(taskData.filter((task) => task.id !== id));
   };
+  const handleSubmit = (taskData) => {
+    axios.post(`${kbaseURL}/tasks`, taskData)
+      .then((result) => {
+        setTaskData((prevTasks) => [convertFromApi(result.data), ...prevTasks]);
+      })
+      .catch((error) => console.log(error));
+  };
+
 
   return (
     <div className='App'>
@@ -91,6 +101,7 @@ const App = () => {
       </header>
       <main>
         <div>
+          <NewTaskForm handleSubmit={handleSubmit}/>
           <TaskList
             tasks={taskData}
             onTaskClickCallback={handleCompleteTask}
