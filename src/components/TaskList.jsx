@@ -4,6 +4,9 @@ import './TaskList.css';
 
 const TaskList = ({ tasks, onTaskClickCallback, onTaskDeleteCallback }) => {
   const taskComponents = (tasks) => {
+    if (tasks.length === 0) {
+      return <p>No tasks to display</p>;
+    }
     return tasks.map((task) => {
       return (
         <Task
