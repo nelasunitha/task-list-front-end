@@ -83,16 +83,26 @@ const App = () => {
     }
   };
   const handleDeleteTask = (id) => {
-    setTaskData(taskData.filter((task) => task.id !== id));
+    return axios
+      .delete(`${kbaseURL}/tasks/${id}`)
+      .then(() => {
+        setTaskData(taskData.filter((task) => task.id !== id));
+      })
+      .catch((error) => {
+        console.error('Error deleting task:', error);
+      });
   };
   const handleSubmit = (taskData) => {
-    axios.post(`${kbaseURL}/tasks`, taskData)
+    axios
+      .post(`${kbaseURL}/tasks`, taskData)
       .then((result) => {
-        setTaskData((prevTasks) => [convertFromApi(result.data), ...prevTasks]);
+        setTaskData((prevTasks) => [
+          convertFromApi(result.data.task),
+          ...prevTasks,
+        ]);
       })
       .catch((error) => console.log(error));
   };
-
 
   return (
     <div className='App'>
@@ -101,7 +111,7 @@ const App = () => {
       </header>
       <main>
         <div>
-          <NewTaskForm handleSubmit={handleSubmit}/>
+          <NewTaskForm handleSubmit={handleSubmit} />
           <TaskList
             tasks={taskData}
             onTaskClickCallback={handleCompleteTask}
