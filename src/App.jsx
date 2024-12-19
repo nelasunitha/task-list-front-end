@@ -16,8 +16,6 @@ import TaskList from './components/TaskList';
 // ];
 
 const kbaseURL = 'http://127.0.0.1:5000';
-// const tasks = axios.get('http://127.0.0.1:5000/tasks')
-// console.log(tasks)
 
 const convertFromApi = (apiTask) => {
   const newTask = {
@@ -42,12 +40,21 @@ const getAllTasksApi = () => {
       console.log(error);
     });
 };
+const updateTaskApi = (id,isComplete) => {
+  const endpoint = isComplete ? 'mark_complete' : 'mark_incomplete';
+  return axios.patch(`${kbaseURL}/tasks/${id}/${endpoint}`)
+    .then( response => {
+      console.log('r',response);
+      const newTask = convertFromApi(response.data);
+      return newTask;
+    })
+    .catch( error => {
+      console.log(error);
+    });
+};
 
 const App = () => {
   const [taskData, setTaskData] = useState([]);
-  // useEffect(() => {
-  //   getAllTasksApi();
-  // }, []);
 
   useEffect(() => {
     getAllTasksApi()
@@ -60,34 +67,21 @@ const App = () => {
   }, []);
 
   const handleCompleteTask = (id) => {
-    // const task = taskData.find((task) => task.id === id);
-    // if (task) {
-    //   axios.patch(`http://localhost:5000/tasks/${id}`, { isComplete: !task.isComplete })
-    //     .then((response) => {
-    setTaskData((prevTaskData) =>
-      prevTaskData.map((task) => {
-        if (task.id === id) {
-          return { ...task, isComplete: !task.isComplete };
-        } else {
-          return task;
-        }
-      })
-    );
-    //     })
-    //     .catch((error) => {
-    //       console.error('Error updating task:', error);
-    //     });
-    // }
+    const task = taskData.find((task) => task.id === id);
+    if (task) {
+      updateTaskApi(id, !task.isComplete)
+        .then((newTask) => {
+          setTaskData((prevTaskData) =>
+            prevTaskData.map((task) => (task.id === id ? newTask : task))
+          );
+        })
+        .catch((error) => {
+          console.error('Error updating task:', error);
+        });
+    }
   };
-
   const handleDeleteTask = (id) => {
-    //   axios.delete(`http://localhost:5000/tasks/${id}`)
-    //     .then(() => {
     setTaskData(taskData.filter((task) => task.id !== id));
-    // })
-    //     .catch((error) => {
-    //       console.error('Error deleting task:', error);
-    //     });
   };
 
   return (
