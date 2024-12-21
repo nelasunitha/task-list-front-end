@@ -111,7 +111,10 @@ const App = () => {
       </header>
       <main>
         <div>
-          <NewTaskForm handleSubmit={handleSubmit} />
+          <div>
+            <NewTaskForm handleSubmit={handleSubmit} />
+          </div>
+
           <TaskList
             tasks={taskData}
             onTaskClickCallback={handleCompleteTask}
